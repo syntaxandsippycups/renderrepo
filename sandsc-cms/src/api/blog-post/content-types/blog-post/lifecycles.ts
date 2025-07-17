@@ -4,11 +4,16 @@ export default {
   async afterCreate(event) {
     const { result } = event;
 
-    const subscribers = await strapi.entityService.findMany('api::subscriber.subscriber', {
-      fields: ['email'],
-    });
+    const subscribers = await strapi.entityService.findMany(
+      'api::subscriber.subscriber' as any,
+      {
+        fields: ['email'],
+      }
+    );
 
-    for (const sub of subscribers as { email: string }[]) {
+    const subscribersTyped = subscribers as unknown as { email: string }[];
+
+    for (const sub of subscribersTyped) {
       if (sub.email) {
         await sendNewPostEmail(sub.email, result.title);
       }
