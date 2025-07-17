@@ -1,20 +1,13 @@
 import { sendNewPostEmail } from '../../../../utils/email';
 
 export default {
-  async afterCreate(event) {
+  async afterCreate({ result }) {
     try {
-      const { result } = event;
+      const fullPost = await strapi.entityService.findOne('api::blog-post.blog-post', result.id, {
+        populate: ['thumbnail'],
+      });
 
-      // Get full blog post with relations (thumbnail)
-      const fullPost = await strapi.entityService.findOne(
-        'api::blog-post.blog-post',
-        result.id,
-        {
-          populate: ['thumbnail'],
-        }
-      );
-
-      const title = fullPost.title;
+      const title = fullPost.Title; // Match your content type exactly
       const content = fullPost.content || '';
       const slug = fullPost.slug;
       const thumbnailUrl = fullPost.thumbnail?.url
@@ -23,16 +16,17 @@ export default {
 
       const subscribers = await strapi.entityService.findMany('api::subscriber.subscriber' as any);
 
-      for (const sub of subscribers) {
-        if (sub && typeof sub.email === 'string') {
-          await sendNewPostEmail(
-            sub.email,
-            title,
-            content,
-            slug,
-            thumbnailUrl
-            sub.id // pass subscriber ID
-          );
+      if (Array.isArray(subscribers)) {
+        for (const sub of subscribers) {
+          if (sub && typeof sub.email === 'string') {
+            await sendNewPostEmail(
+              sub.email,
+              title,
+              content,
+              slug,
+              sub.id // pass subscriberId
+            );
+          }
         }
       }
     } catch (err) {

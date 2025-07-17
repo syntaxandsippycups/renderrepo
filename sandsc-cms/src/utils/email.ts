@@ -5,7 +5,7 @@ export const sendNewPostEmail = async (
   title: string,
   content: string,
   slug: string,
-  thumbnailUrl?: string
+  thumbnailUrl?: string,
   subscriberId?: number // <-- new
 ) => {
   const transporter = nodemailer.createTransport({
@@ -29,7 +29,7 @@ export const sendNewPostEmail = async (
     from: `"Syntax & SippyCups" <${process.env.EMAIL_USER}>`,
     to,
     subject: `New Blog Post: ${title}`,
-    text: `Check out my latest post "${title}":\n\n${snippet}\n\nRead more: ${postUrl}`,
+    text: `Check out our latest post "${title}":\n\n${snippet}\n\nRead more: ${postUrl}\n\nUnsubscribe: ${unsubscribeUrl}`,
     html: `
         <div style="font-family: Arial, sans-serif; padding: 20px;">
           <h2>New Blog Post: ${title}</h2>
