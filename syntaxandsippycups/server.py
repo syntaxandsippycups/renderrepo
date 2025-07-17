@@ -18,6 +18,7 @@ app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 
 STRAPI_API = 'https://api.syntaxandsippycups.com/api'
+STRAPI_URL = 'https://api.syntaxandsippycups.com'  # <-- add this
 
 mail = Mail(app)
 
