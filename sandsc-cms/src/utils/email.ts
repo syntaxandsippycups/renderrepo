@@ -6,7 +6,7 @@ export const sendNewPostEmail = async (
   content: string,
   slug: string,
   thumbnailUrl?: string,
-  subscriberId?: number // <-- new
+  subscriberId?: string  // <-- FIXED
 ) => {
   const transporter = nodemailer.createTransport({
     service: 'gmail',
