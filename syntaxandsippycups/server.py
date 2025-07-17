@@ -30,10 +30,9 @@ def index():
 def subscribe():
     try:
         email = request.json.get('email')
-        print("Received email from frontend:", email)
+        print("Email received from front-end:", email)
 
         if not email:
-            print("No email provided.")
             return jsonify({'message': 'Email is required'}), 400
 
         response = requests.post(f'{STRAPI_API}/subscribers', json={
@@ -42,22 +41,17 @@ def subscribe():
             }
         })
 
-        print("Strapi response code:", response.status_code)
-        print("Strapi response body:", response.text)
+        print('Strapi Response:', response.status_code, response.text)
 
-        if response.status_code in (200, 201):
+        if response.status_code in [200, 201]:
             return jsonify({'message': 'Thank you for subscribing!'}), 200
         elif response.status_code == 400:
-            error = response.json()
-            print("Validation error from Strapi:", error)
-            if any("already taken" in msg.get('message', '') for err in error.get('error', {}).get('details', {}).get('errors', []) for msg in err.get('messages', [])):
-                return jsonify({'message': "You're already subscribed!"}), 200
-            return jsonify({'message': 'Subscription failed. Please try again.'}), 400
+            return jsonify({'message': 'You have already be subscribed.'}), 200
         else:
             return jsonify({'message': 'Something went wrong. Please try again.'}), 500
 
     except Exception as e:
-        print("Exception during subscription:", str(e))
+        print('Error during subscription:', str(e))
         return jsonify({'message': f'Subscription failed: {e}'}), 500
 
 @app.route('/blog')
@@ -69,7 +63,6 @@ def blog(category_slug=None):
             f"{STRAPI_API}/blog-posts?populate=*&sort[0]=publishedAt:desc&pagination[limit]=9"
         )
         response.raise_for_status()
-        print(response.text)
         result = response.json()
 
         posts = []
@@ -99,7 +92,6 @@ def blog_detail(slug):
 
         post_data = data[0]
 
-        print("Strapi response:", response.json())
 
         post = {
             'title': post_data['Title'],
