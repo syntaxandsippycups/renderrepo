@@ -1,6 +1,11 @@
 import nodemailer from 'nodemailer';
 
-export const sendNewPostEmail = async (to: string, title: string) => {
+export const sendNewPostEmail = async (
+  to: string,
+  title: string,
+  content: string,
+  slug: string
+) => {
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -9,11 +14,20 @@ export const sendNewPostEmail = async (to: string, title: string) => {
     },
   });
 
+  const snippet = content.length > 200 ? content.slice(0, 200) + '...' : content;
+  const postUrl = `https://syntaxandsippycups.com/blog/${slug}`;
+
   await transporter.sendMail({
-    from: `"Syntax and SuppyCups" <${process.env.EMAIL_USER}>`,
+    from: `"Syntax & SippyCups" <${process.env.EMAIL_USER}>`,
     to,
-    subject: 'New Blog Post Published!',
-    text: `Check out our latest post: "${title}"`,
-    html: `<p>Check out our latest post: <strong>${title}</strong></p>`,
+    subject: `New Blog Post: ${title}`,
+    text: `Check out our new post "${title}":\n\n${snippet}\n\nRead more: ${postUrl}`,
+    html: `
+      <div style="font-family: Arial, sans-serif; padding: 20px;">
+        <h2>New Blog Post: ${title}</h2>
+        <p>${snippet}</p>
+        <p><a href="${postUrl}" target="_blank">Read the full post</a></p>
+      </div>
+    `,
   });
 };
