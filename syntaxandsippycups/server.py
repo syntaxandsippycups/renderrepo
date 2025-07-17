@@ -52,6 +52,7 @@ def subscribe():
 
     except Exception as e:
         return jsonify({'message': f'Subscription failed: {e}'}), 500
+        
 @app.route('/blog')
 @app.route('/category/<category_slug>')
 def blog(category_slug=None):

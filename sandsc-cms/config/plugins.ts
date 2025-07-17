@@ -1,16 +1,15 @@
 export default ({ env }) => ({
   email: {
     config: {
-      provider: 'nodemailer', // or use sendgrid/mailgun/etc
+      provider: 'nodemailer',
       providerOptions: {
-        service: 'gmail',
-        host: env('SMTP_HOST'),
-        port: env.int('SMTP_PORT'),
+        host: env('SMTP_HOST', 'smtp.gmail.com'), // Gmail's SMTP
+        port: env.int('SMTP_PORT', 587),          // Use 587 (STARTTLS) for Gmail
+        secure: false,                            // secure: false for STARTTLS (true is for port 465)
         auth: {
           user: env('SMTP_USERNAME'),
           pass: env('SMTP_PASSWORD'),
         },
-        secure: true,
       },
       settings: {
         defaultFrom: env('SMTP_FROM'),
