@@ -134,7 +134,7 @@ def blog_detail(slug):
         try:
             categories_resp = requests.get(f"{STRAPI_API}/categories?populate=blog_posts")
             categories_resp.raise_for_status()  # raises an exception if status is 4xx/5xx
-            print("Strapi category response:", categories_resp.json())
+            #print("Strapi category response:", categories_resp.json())
 
             categories_json = categories_resp.json()
             categories = []
