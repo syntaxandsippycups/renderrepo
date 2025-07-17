@@ -1,14 +1,20 @@
-FROM node:20
+# Base image
+FROM node:18
 
+# Set working directory
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm install
-
+# Copy app files
 COPY . .
 
-ENV NODE_ENV=production
+# Install dependencies
+RUN npm install
 
+# ⚠️ Build the admin panel for production
+RUN npm run build
+
+# Expose the port Strapi runs on
 EXPOSE 1337
 
+# Start Strapi in production
 CMD ["npm", "run", "start"]
