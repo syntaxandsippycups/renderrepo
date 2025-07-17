@@ -1,0 +1,24 @@
+services:
+  flask:
+    build:
+      context: ./syntaxandsippycups
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    depends_on:
+      - strapi
+    networks:
+      - app-network
+
+  strapi:
+    build:
+      context: ./sandsc-cms
+      dockerfile: Dockerfile
+    ports:
+      - "1337:1337"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
