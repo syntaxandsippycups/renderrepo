@@ -1,0 +1,69 @@
+{% include 'navbar/index.html' %}
+
+  <main class="main">
+
+    <!-- Blog Posts Section -->
+    <section id="blog-posts" class="blog-posts section">
+
+      <div class="container">
+        <div class="row gy-4">
+
+          {% for post in posts %}
+          <div class="col-lg-4">
+            <article>
+
+              <div class="post-img">
+                <img src="{{ post.thumbnail }}" alt="thumbnail"  class="img-fluid">
+              </div>
+
+              <p class="post-category">Motherhood</p>
+
+              <h2 class="title">
+                <a href="{{ url_for('blog_detail', slug=post.slug) }}">{{ post.title }}</a>
+              </h2>
+
+              <div class="d-flex align-items-center">
+                <div class="post-meta">
+                  <p class="post-date">
+                    <time datetime="2022-01-01">{{ post.publishedDate[:10] }}</time>
+                  </p>
+                </div>
+              </div>
+
+            </article>
+          </div><!-- End post list item -->
+          {% endfor %}
+
+
+
+        </div>
+      </div>
+
+    </section><!-- /Blog Posts Section -->
+
+
+
+    <!-- Blog Pagination Section -->
+    <!--
+    <section id="blog-pagination" class="blog-pagination section">
+
+      <div class="container">
+        <div class="d-flex justify-content-center">
+          <ul>
+            <li><a href="#"><i class="bi bi-chevron-left"></i></a></li>
+            <li><a href="#">1</a></li>
+            <li><a href="#" class="active">2</a></li>
+            <li><a href="#">3</a></li>
+            <li><a href="#">4</a></li>
+            <li>...</li>
+            <li><a href="#">10</a></li>
+            <li><a href="#"><i class="bi bi-chevron-right"></i></a></li>
+          </ul>
+        </div>
+      </div>
+
+    </section><!-- /Blog Pagination Section -->
+
+  </main>
+
+{% include 'footer/index.html' %}

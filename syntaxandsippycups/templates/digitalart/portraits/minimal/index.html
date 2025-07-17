@@ -1,0 +1,110 @@
+{% include 'navbar/index.html' %}
+
+  <main class="main">
+
+    <!-- Members Section -->
+    <section id="members" class="members section">
+
+      <div class="container">
+
+        <div class="row row-gap">
+
+          <!-- Carousel wrapper -->
+          <div id="carouselExampleIndicators" class="carousel slide col-lg-6" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+              <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+              <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+              <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+              <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="3" aria-label="Slide 4"></button>
+              <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="4" aria-label="Slide 5"></button>
+              <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="5" aria-label="Slide 6"></button>
+              <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="6" aria-label="Slide 7"></button>
+            </div>
+            <div class="carousel-inner">
+              <div class="carousel-item active">
+                <img src="../../../../static/assets/img/digitalart/portraits/faceless1.PNG" style="height: 45em" class="d-block w-100" alt="...">
+              </div>
+              <div class="carousel-item">
+                <img src="../../../../static/assets/img/digitalart/portraits/faceless2.PNG" style="height: 45em" class="d-block w-100" alt="...">
+              </div>
+              <div class="carousel-item">
+                <img src="../../../../static/assets/img/digitalart/portraits/faceless3.PNG" style="height: 45em" class="d-block w-100" alt="...">
+              </div>
+              <div class="carousel-item">
+                <img src="../../../../static/assets/img/digitalart/portraits/faceless4.PNG" style="height: 45em" class="d-block w-100" alt="...">
+              </div>
+              <div class="carousel-item">
+                <img src="../../../../static/assets/img/digitalart/portraits/faceless5.PNG" style="height: 45em" class="d-block w-100" alt="...">
+              </div>
+              <div class="carousel-item">
+                <img src="../../../../static/assets/img/digitalart/portraits/faceless6.PNG" style="height: 45em" class="d-block w-100" alt="...">
+              </div>
+              <div class="carousel-item">
+                <img src="../../../../static/assets/img/digitalart/portraits/faceless7.PNG" style="height: 45em" class="d-block w-100" alt="...">
+              </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Next</span>
+            </button>
+          </div>
+
+
+
+          <div class="col-lg-4 pt-4 pt-lg-0">
+            <h3>Minimal Digital Portrait</h3>
+            <p class="fst-italic">
+              $25+
+            </p>
+            <p>
+              Minimalist personalized portrait illustrations. Includes a solid color background and optional text. Pricing starts at $25 for 1-5 people. additional persons are $1 per person up to $30 for 10 people. Portraits exceeding 10 people will incur an additional cost.
+            </p>
+            <p>
+              Photos will be sent to the email entered below in approximately 1-2 days. If you need faster delivery or additional photo sizes please state this in your personalization details.
+            </p>
+            <p style="color:red;">
+              NOTE: This is a DIGITAL FILE ONLY. You will NOT be shipped a physical item.
+            </p>
+            <form>
+              <label for="personcount">Number of People:</label>
+              <select name="personcount" id="personcount">
+                <option value="">--Please select number of people in portrait--</option>
+                <option value="1-5">1-5 - $25</option>
+                <option value="6">6 - $26</option>
+                <option value="7">7 - $27</option>
+                <option value="8">8 - $28</option>
+                <option value="9">9 - $29</option>
+                <option value="10">10 - $30</option>
+                <option value="10+">10+ - $35</option>
+              </select>
+
+              <label for="personalization">Personalization requests:</label>
+              <textarea type="text" name="personalization" id="personalization" value="Use this field to specify details such as background color, family name, additional personalized requests you wish to make. They will be honored as best a possible"></textarea>
+
+              <label for="email">Email:</label>
+              <input type="email" name="email" id="email" value="Use this field to specify The email you wish the digital portrait files to be sent to.">
+
+              <label for="size">Photo Size:</label>
+              <div class="row">
+                <button id="size-button-1" class="size-buttons">4x6</button>
+                <button id="size-button-2" class="size-buttons">5x7</button>
+                <button id="size-button-3" class="size-buttons">8x10</button>
+                <button id="size-button-4" class="size-buttons">11x14</button>
+              </div>
+
+              <div class="text-center"><a href="checkout"><button class="checkout" type="submit">Add to Cart</button></a></div>
+            </form>
+          </div>
+        </div>
+
+      </div>
+
+    </section><!-- /Members Section -->
+
+  </main>
+
+{% include 'footer/index.html' %}
