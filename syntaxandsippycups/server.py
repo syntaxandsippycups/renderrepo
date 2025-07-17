@@ -17,8 +17,7 @@ app.config['MAIL_PASSWORD'] = '28058a12059d57'  # Replace with your actual passw
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 
-STRAPI_URL = 'http://localhost:1337'
-STRAPI_API = f'{STRAPI_URL}/api'
+STRAPI_API = 'https://api.syntaxandsippycups.com/api'
 
 mail = Mail(app)
 
