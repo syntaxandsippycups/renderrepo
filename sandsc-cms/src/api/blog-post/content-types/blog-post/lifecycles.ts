@@ -5,14 +5,16 @@ export default {
     try {
       const subscribers = await strapi.entityService.findMany('api::subscriber.subscriber' as any);
 
-      for (const sub of subscribers as { email: string }[]) {
-        if (sub.email) {
-          await sendNewPostEmail(
-            sub.email,
-            result.title,
-            result.content,   // Make sure "content" is a field in your blog post
-            result.slug       // Make sure "slug" is a field in your blog post
-          );
+      if (Array.isArray(subscribers)) {
+        for (const sub of subscribers) {
+          if (sub && typeof sub.email === 'string') {
+            await sendNewPostEmail(
+              sub.email,
+              result.title,
+              result.content,
+              result.slug
+            );
+          }
         }
       }
     } catch (err) {
