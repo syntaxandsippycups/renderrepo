@@ -1,5 +1,3 @@
-'use strict';
+import { factories } from '@strapi/strapi';
 
-const { createCoreService } = require('@strapi/strapi').factories;
-
-module.exports = createCoreService('api::subscriber.subscriber');
+export default factories.createCoreService('api::subscriber.subscriber');
