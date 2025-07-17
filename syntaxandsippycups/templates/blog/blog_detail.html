@@ -156,6 +156,40 @@
               </form>
 
             </div><!--/Search Widget -->
+            <!-- Subscription Form -->
+            <div id="subscribe-section">
+              <form id="subscribe-form">
+                <input class="subscribe-input" type="email" name="email" id="email" required placeholder="Enter your email" />
+                <button class="btn-primary subscribe-btn" type="submit">Subscribe</button>
+              </form>
+            </div>
+
+            <!-- Thank You Message (hidden by default) -->
+            <div id="thank-you-message" style="display:none;">
+              <p>Thank you for subscribing!</p>
+            </div>
+
+            <script>
+              document.getElementById('subscribe-form').addEventListener('submit', function (e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+
+                fetch('/subscribe', {
+                  method: 'POST',
+                  body: formData
+                })
+                .then(res => res.json())
+                .then(data => {
+                  if (data.message) {
+                    document.getElementById('subscribe-section').style.display = 'none';
+                    document.getElementById('thank-you-message').style.display = 'block';
+                  } else {
+                    alert('Subscription failed. Please try again.');
+                  }
+                })
+                .catch(() => alert('Something went wrong. Please try again.'));
+              });
+            </script>
 
             <!-- Categories Widget -->
             <div class="categories-widget widget-item">

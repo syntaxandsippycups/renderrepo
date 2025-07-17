@@ -26,6 +26,20 @@ mail = Mail(app)
 def index():
   return render_template('index.html')
 
+@app.route('/subscribe', methods=['POST'])
+def subscribe():
+    email = request.form.get('email')
+    try:
+        response = requests.post(
+            f"{STRAPI_API}/subscribers",
+            json={"data": {"email": email}},
+            headers={"Content-Type": "application/json"}
+        )
+        response.raise_for_status()
+        return jsonify({"message": "Thank you for subscribing!"}), 200
+    except requests.exceptions.RequestException as e:
+        return jsonify({"error": "Subscription failed"}), 400
+
 @app.route('/blog')
 @app.route('/category/<category_slug>')
 def blog(category_slug=None):
