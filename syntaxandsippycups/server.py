@@ -30,20 +30,26 @@ def index():
 def subscribe():
     try:
         email = request.json.get('email')
+        print("Received email from frontend:", email)
+
         if not email:
+            print("No email provided.")
             return jsonify({'message': 'Email is required'}), 400
 
-        # POST to Strapi
         response = requests.post(f'{STRAPI_API}/subscribers', json={
             'data': {
                 'email': email
             }
         })
 
-        if response.status_code == 200 or response.status_code == 201:
+        print("Strapi response code:", response.status_code)
+        print("Strapi response body:", response.text)
+
+        if response.status_code in (200, 201):
             return jsonify({'message': 'Thank you for subscribing!'}), 200
         elif response.status_code == 400:
             error = response.json()
+            print("Validation error from Strapi:", error)
             if any("already taken" in msg.get('message', '') for err in error.get('error', {}).get('details', {}).get('errors', []) for msg in err.get('messages', [])):
                 return jsonify({'message': "You're already subscribed!"}), 200
             return jsonify({'message': 'Subscription failed. Please try again.'}), 400
@@ -51,8 +57,9 @@ def subscribe():
             return jsonify({'message': 'Something went wrong. Please try again.'}), 500
 
     except Exception as e:
+        print("Exception during subscription:", str(e))
         return jsonify({'message': f'Subscription failed: {e}'}), 500
-        
+
 @app.route('/blog')
 @app.route('/category/<category_slug>')
 def blog(category_slug=None):
