@@ -54,6 +54,22 @@ def subscribe():
         print('Error during subscription:', str(e))
         return jsonify({'message': f'Subscription failed: {e}'}), 500
 
+
+@app.route('/unsubscribe/<int:subscriber_id>', methods=['GET'])
+def unsubscribe(subscriber_id):
+    # Hit Strapi DELETE or unpublish endpoint
+    try:
+        # You can either delete or mark as unsubscribed (if you add a boolean field)
+        response = requests.delete(f"{STRAPI_API}/subscribers/{subscriber_id}")
+
+        if response.status_code in (200, 204):
+            return render_template("/unsubscribe/success.html")
+        else:
+            return render_template("/unsubscribe/failed.html", error=response.text)
+    except Exception as e:
+        return render_template("/unsubscribe/failed.html", error=str(e))
+
+
 @app.route('/blog')
 @app.route('/category/<category_slug>')
 def blog(category_slug=None):
@@ -77,7 +93,7 @@ def blog(category_slug=None):
         return render_template('/blog/index.html', posts=posts, category_slug=category_slug)
 
     except Exception as e:
-        return render_template('error.html', message=f"Error loading posts: {e}")
+        return render_template('/error/500.html', message=f"Error loading posts: {e}")
 
 
 @app.route('/blog/<slug>')
@@ -88,7 +104,7 @@ def blog_detail(slug):
         response = requests.get(f"{STRAPI_API}/blog-posts?filters[slug][$eq]={slug}&populate=*")
         data = response.json()['data']
         if not data:
-            return render_template('error.html', message=f"Blog post not found for slug: {slug}")
+            return render_template('/error/500.html', message=f"Blog post not found for slug: {slug}")
 
         post_data = data[0]
 
@@ -138,9 +154,9 @@ def blog_detail(slug):
             return render_template('/blog/blog_detail.html', post=post, recent=recent, categories=categories)
 
         except requests.exceptions.RequestException as req_err:
-            return render_template('error.html', message=f"Request error while loading categories: {req_err}")
+            return render_template('/error/500.html', message=f"Request error while loading categories: {req_err}")
     except Exception as e:
-        return render_template('error.html', message=f"Error loading blog: {e}")
+        return render_template('/error/500.html', message=f"Error loading blog: {e}")
 
 @app.route('/clothing')
 def clothing():
