@@ -28,18 +28,30 @@ def index():
 
 @app.route('/subscribe', methods=['POST'])
 def subscribe():
-    email = request.form.get('email')
     try:
-        response = requests.post(
-            f"{STRAPI_API}/subscribers",
-            json={"data": {"email": email}},
-            headers={"Content-Type": "application/json"}
-        )
-        response.raise_for_status()
-        return jsonify({"message": "Thank you for subscribing!"}), 200
-    except requests.exceptions.RequestException as e:
-        return jsonify({"error": "Subscription failed"}), 400
+        email = request.json.get('email')
+        if not email:
+            return jsonify({'message': 'Email is required'}), 400
 
+        # POST to Strapi
+        response = requests.post(f'{STRAPI_API}/subscribers', json={
+            'data': {
+                'email': email
+            }
+        })
+
+        if response.status_code == 200 or response.status_code == 201:
+            return jsonify({'message': 'Thank you for subscribing!'}), 200
+        elif response.status_code == 400:
+            error = response.json()
+            if any("already taken" in msg.get('message', '') for err in error.get('error', {}).get('details', {}).get('errors', []) for msg in err.get('messages', [])):
+                return jsonify({'message': "You're already subscribed!"}), 200
+            return jsonify({'message': 'Subscription failed. Please try again.'}), 400
+        else:
+            return jsonify({'message': 'Something went wrong. Please try again.'}), 500
+
+    except Exception as e:
+        return jsonify({'message': f'Subscription failed: {e}'}), 500
 @app.route('/blog')
 @app.route('/category/<category_slug>')
 def blog(category_slug=None):
