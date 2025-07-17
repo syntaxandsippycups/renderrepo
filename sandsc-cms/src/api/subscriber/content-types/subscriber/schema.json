@@ -1,5 +1,5 @@
 {
-  "kind" : "collectionType",
+  "kind": "collectionType",
   "collectionName": "subscribers",
   "info": {
     "singularName": "subscriber",
@@ -7,8 +7,9 @@
     "displayName": "Subscriber"
   },
   "options": {
-    "draftAndPublish": false
+    "draftAndPublish": true
   },
+  "pluginOptions": {},
   "attributes": {
     "email": {
       "type": "email",

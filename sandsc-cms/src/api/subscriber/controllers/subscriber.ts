@@ -1,3 +1,7 @@
-import { factories } from '@strapi/strapi';
+/**
+ * subscriber controller
+ */
 
-export default factories.createCoreController('api::subscriber.subscriber' as any);
+import { factories } from '@strapi/strapi'
+
+export default factories.createCoreController('api::subscriber.subscriber');
