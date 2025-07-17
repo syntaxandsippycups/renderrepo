@@ -3,16 +3,14 @@ import { sendNewPostEmail } from '../../../../utils/email';
 export default {
   async afterCreate({ result }) {
     try {
-      const fullPost = await strapi.entityService.findOne('api::blog-post.blog-post', result.id, {
-        populate: ['thumbnail'],
-      });
+      const fullPost = result as any; // loosen type enforcement
 
-      const title = fullPost.Title; // Match your content type exactly
-      const content = fullPost.content || '';
+      const title = fullPost.Title;
+      const content = fullPost.content;
       const slug = fullPost.slug;
       const thumbnailUrl = fullPost.thumbnail?.url
         ? `https://api.syntaxandsippycups.com${fullPost.thumbnail.url}`
-        : null;
+        : undefined;
 
       const subscribers = await strapi.entityService.findMany('api::subscriber.subscriber' as any);
 
@@ -24,7 +22,8 @@ export default {
               title,
               content,
               slug,
-              sub.id // pass subscriberId
+              thumbnailUrl,
+              String(sub.id) // <-- cast to string
             );
           }
         }
