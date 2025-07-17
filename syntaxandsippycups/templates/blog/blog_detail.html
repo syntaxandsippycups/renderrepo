@@ -101,16 +101,11 @@
                 </div><!-- End post content -->
 
                 <div class="meta-bottom">
-                  <i class="bi bi-folder"></i>
-                  <ul class="cats">
-                    <li><a href="#">Business</a></li>
-                  </ul>
-
                   <i class="bi bi-tags"></i>
                   <ul class="tags">
-                    <li><a href="#">Creative</a></li>
-                    <li><a href="#">Tips</a></li>
-                    <li><a href="#">Marketing</a></li>
+                    {% for cat in categories %}
+                    <li><a href="{{ url_for('blog', category_slug=cat.slug) }}">{{ cat.name }}</a></li>
+                    {% endfor %}
                   </ul>
                 </div><!-- End meta bottom -->
 
@@ -213,7 +208,6 @@
                 <img src="{{ r.thumbnail }}" alt="" class="flex-shrink-0">
                 <div>
                   <h4><a href="{{ url_for('blog_detail', slug=r.slug) }}">{{ r.title }}</a></h4>
-                  <time >{{ r.publishedDate[:10] }}</time>
                 </div>
               </div><!-- End recent post item-->
               {% endfor %}
