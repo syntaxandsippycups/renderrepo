@@ -1,16 +1,14 @@
-
-import { sendNewPostEmail } from '../../../utils/email';
+import { sendNewPostEmail } from '../../../../utils/email';
 
 export default {
-  async afterCreate(event: any) {
+  async afterCreate(event) {
     const { result } = event;
 
-    // Get all subscribers
     const subscribers = await strapi.entityService.findMany('api::subscriber.subscriber', {
       fields: ['email'],
     });
 
-    for (const sub of subscribers) {
+    for (const sub of subscribers as { email: string }[]) {
       if (sub.email) {
         await sendNewPostEmail(sub.email, result.title);
       }

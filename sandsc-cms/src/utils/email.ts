@@ -1,7 +1,19 @@
-export const sendNewPostEmail = async (email: string, title: string) => {
-  await strapi.plugin('email').service('email').send({
-    to: email,
-    subject: `New Blog Post: ${title}`,
-    text: `Check out our latest blog post titled "${title}".`,
+import nodemailer from 'nodemailer';
+
+export const sendNewPostEmail = async (to: string, title: string) => {
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.SMTP_USERNAME,
+      pass: process.env.SMTP_PASSWORD,
+    },
+  });
+
+  await transporter.sendMail({
+    from: `"Syntax and SuppyCups" <${process.env.EMAIL_USER}>`,
+    to,
+    subject: 'New Blog Post Published!',
+    text: `Check out our latest post: "${title}"`,
+    html: `<p>Check out our latest post: <strong>${title}</strong></p>`,
   });
 };
