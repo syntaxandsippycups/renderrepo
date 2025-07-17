@@ -321,7 +321,7 @@ h6 {
 
   .navmenu a,
   .navmenu a:focus {
-    color: var(--nav-dropdown-color);
+    color: white;
     padding: 10px 20px;
     font-family: var(--nav-font);
     font-size: 17px;
@@ -406,7 +406,6 @@ h6 {
     position: fixed;
     overflow: hidden;
     inset: 0;
-    background: rgba(33, 37, 41, 0.8);
     transition: 0.3s;
   }
 
