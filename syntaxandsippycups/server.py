@@ -91,6 +91,7 @@ def blog(category_slug=None):
 @app.route('/blog/<slug>')
 def blog_detail(slug):
     try:
+        # Fetch the blog post
         resp = requests.get(f"{STRAPI_API}/blog-posts?filters[slug][$eq]={slug}&populate=*")
         resp.raise_for_status()
         data = resp.json().get('data', [])
@@ -99,6 +100,7 @@ def blog_detail(slug):
 
         post_data = data[0]
 
+        # Process blog post content and thumbnail
         content_md = post_data.get('content', '')
         thumbnail_url = ''
         thumb_data = post_data.get('thumbnail')
@@ -118,6 +120,7 @@ def blog_detail(slug):
             'publishedDate': post_data.get('publishedDate', '')
         }
 
+        # Fetch recent posts (excluding this one)
         recent_posts = []
         r = requests.get(f"{STRAPI_API}/blog-posts?sort[0]=publishedAt:desc&pagination[limit]=4&populate=thumbnail")
         r.raise_for_status()
@@ -134,11 +137,14 @@ def blog_detail(slug):
                 'publishedDate': item.get('publishedDate', '')
             })
 
+        # 🛠️ FIX: Pull categories from the current post
+        categories_raw = post_data.get('categories', [])
+
         categories = [
             {
                 'id': cat['id'],
-                'title': cat['Title'],
-                'slug': cat['slug'],
+                'title': cat.get('Title', ''),
+                'slug': cat.get('slug', ''),
                 'count': len(cat.get('blog_posts', [])) if isinstance(cat.get('blog_posts'), list) else 0
             }
             for cat in categories_raw
@@ -149,6 +155,7 @@ def blog_detail(slug):
     except Exception as e:
         traceback.print_exc()
         return render_template('error/500.html', message=f"Error in blog_detail: {e}")
+
 
 @app.route('/clothing')
 def clothing():
