@@ -83,33 +83,29 @@ def blog(category_slug=None):
 
         posts = []
         for item in result.get('data', []):
-            attr = item.get('attributes', {})
-            thumbnail_data = attr.get('thumbnail', {}).get('data')
+            # Flattened structure — no .get('attributes', {})
+            thumbnail_data = item.get('thumbnail')
             thumbnail_url = ''
-            if thumbnail_data:
-                thumbnail_attrs = thumbnail_data.get('attributes', {})
-                formats = thumbnail_attrs.get('formats', {})
+            if thumbnail_data and isinstance(thumbnail_data, dict):
+                formats = thumbnail_data.get('formats', {})
                 thumbnail_url = (
                     formats.get('medium', {}).get('url') or
                     formats.get('small', {}).get('url') or
-                    thumbnail_attrs.get('url', '')
+                    thumbnail_data.get('url', '')
                 )
 
             posts.append({
-                'title': attr.get('Title'),
-                'slug': attr.get('slug'),
+                'title': item.get('Title', ''),
+                'slug': item.get('slug', ''),
                 'thumbnail': thumbnail_url,
-                'publishedDate': attr.get('publishedDate')
+                'publishedDate': item.get('publishedDate', '')
             })
-
 
         return render_template('blog/index.html', posts=posts, category_slug=category_slug)
 
     except Exception as e:
         traceback.print_exc()
         return render_template('error/500.html', message=f"Error loading posts: {e}")
-
-
 
 @app.route('/blog/<slug>')
 def blog_detail(slug):
@@ -185,7 +181,7 @@ def blog_detail(slug):
         traceback.print_exc()
         return render_template('error/500.html', message=f"Error in blog_detail: {e}")
 
-        
+
 @app.route('/clothing')
 def clothing():
   return render_template('/clothing/index.html')
