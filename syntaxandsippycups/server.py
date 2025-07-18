@@ -112,85 +112,72 @@ def blog(category_slug=None):
 @app.route('/blog/<slug>')
 def blog_detail(slug):
     try:
-        response = requests.get(f"{STRAPI_API}/blog-posts?filters[slug][$eq]={slug}&populate=*")
-        response.raise_for_status()
-        data = response.json().get('data')
+        resp = requests.get(f"{STRAPI_API}/blog-posts?filters[slug][$eq]={slug}&populate=*")
+        resp.raise_for_status()
+        data = resp.json().get('data', [])
         if not data:
-            return render_template('/error/500.html', message=f"Blog post not found for slug: {slug}")
+            return render_template('error/500.html', message=f"No blog post found for slug={slug}")
 
-        post_attrs = data[0].get('attributes', {})
+        attrs = data[0].get('attributes', {})
+        title = attrs.get('Title', '')
+        content_md = attrs.get('content', '')
 
-        # Safely handle thumbnail
-        thumbnail_data = post_attrs.get('thumbnail', {}).get('data')
+        # Thumbnail
+        thumbnail_data = attrs.get('thumbnail', {}).get('data')
         thumbnail_url = ''
         if thumbnail_data:
-            thumbnail_attrs = thumbnail_data.get('attributes', {})
-            formats = thumbnail_attrs.get('formats', {})
+            t_attrs = thumbnail_data.get('attributes', {})
+            formats = t_attrs.get('formats', {})
             thumbnail_url = (
                 formats.get('medium', {}).get('url') or
                 formats.get('small', {}).get('url') or
-                thumbnail_attrs.get('url', '')
+                t_attrs.get('url', '')
             )
 
         post = {
-            'title': post_attrs.get('Title'),
-            'content': Markup(markdown.markdown(post_attrs.get('content', ''))),
-            'slug': post_attrs.get('slug'),
+            'title': title,
+            'content': Markup(markdown.markdown(content_md)),
+            'slug': attrs.get('slug', ''),
             'thumbnail': thumbnail_url,
-            'publishedDate': post_attrs.get('publishedDate')
+            'publishedDate': attrs.get('publishedDate', '')
         }
 
         # Recent posts
-        recent_resp = requests.get(f"{STRAPI_API}/blog-posts?sort=publishedDate:desc&pagination[limit]=3&populate=thumbnail")
-        recent = []
-        for item in recent_resp.json().get('data', []):
-            attr = item.get('attributes', {})
-            if attr.get('slug') == slug:
+        recent_posts = []
+        r = requests.get(f"{STRAPI_API}/blog-posts?sort=publishedDate:desc&pagination[limit]=4&populate=thumbnail")
+        r.raise_for_status()
+        for item in r.json().get('data', []):
+            a = item.get('attributes', {})
+            s2 = a.get('slug')
+            if s2 == slug:
                 continue
-
-            thumb_data = attr.get('thumbnail', {}).get('data')
-            thumb_url = ''
-            if thumb_data:
-                thumb_attrs = thumb_data.get('attributes', {})
-                formats = thumb_attrs.get('formats', {})
-                thumb_url = (
-                    formats.get('thumbnail', {}).get('url') or
-                    formats.get('small', {}).get('url') or
-                    thumb_attrs.get('url', '')
-                )
-
-            recent.append({
-                'title': attr.get('Title'),
-                'slug': attr.get('slug'),
-                'thumbnail': thumb_url,
-                'publishedDate': attr.get('publishedDate')
-            })
+            t2 = a.get('Title', '')
+            date2 = a.get('publishedDate', '')
+            thumb2 = ''
+            td = a.get('thumbnail', {}).get('data')
+            if td:
+                ta = td.get('attributes', {})
+                fm = ta.get('formats', {})
+                thumb2 = fm.get('thumbnail', {}).get('url') or ta.get('url', '')
+            recent_posts.append({'title': t2, 'slug': s2, 'thumbnail': thumb2, 'publishedDate': date2})
 
         # Categories
-        try:
-            categories_resp = requests.get(f"{STRAPI_API}/categories?populate=blog_posts")
-            categories_resp.raise_for_status()
-            categories_json = categories_resp.json()
-            categories = []
+        categories = []
+        c = requests.get(f"{STRAPI_API}/categories?populate=blog_posts")
+        c.raise_for_status()
+        for cat in c.json().get('data', []):
+            at = cat.get('attributes', {})
+            categories.append({
+                'name': at.get('name', ''),
+                'slug': at.get('slug', ''),
+                'count': len(at.get('blog_posts', {}).get('data', []))
+            })
 
-            for cat in categories_json.get('data', []):
-                attributes = cat.get('attributes', {})
-                blog_posts = attributes.get('blog_posts', {}).get('data', [])
-                categories.append({
-                    'name': attributes.get('name'),
-                    'slug': attributes.get('slug'),
-                    'count': len(blog_posts)
-                })
-
-            return render_template('/blog/blog_detail.html', post=post, recent=recent, categories=categories)
-
-        except requests.exceptions.RequestException as req_err:
-            return render_template('/error/500.html', message=f"Request error while loading categories: {req_err}")
+        return render_template('blog_detail.html', post=post, recent=recent_posts, categories=categories)
 
     except Exception as e:
-        import traceback
         traceback.print_exc()
-        return render_template('/error/500.html', message=f"Error loading blog: {e}")
+        return render_template('error/500.html', message=f"Error in blog_detail: {e}")
 
 
 @app.route('/clothing')
