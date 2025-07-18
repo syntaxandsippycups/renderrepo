@@ -76,7 +76,7 @@ def blog(category_slug=None):
     try:
         category_filter = f"&filters[categories][slug][$eq]={category_slug}" if category_slug else ""
         response = requests.get(
-            f"{STRAPI_API}/blog-posts?populate=thumbnail,categories&sort[0]=publishedAt:desc&pagination[limit]=9{category_filter}"
+            f"{STRAPI_API}/blog-posts?populate=*&sort[0]=publishedDate:desc&pagination[limit]=9{category_filter}"
         )
         response.raise_for_status()
         result = response.json()
