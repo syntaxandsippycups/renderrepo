@@ -83,16 +83,14 @@ def blog(category_slug=None):
 
         posts = []
         for item in result.get('data', []):
-            # Flattened structure — no .get('attributes', {})
-            thumbnail_data = item.get('thumbnail')
-            thumbnail_url = ''
-            if thumbnail_data and isinstance(thumbnail_data, dict):
-                formats = thumbnail_data.get('formats', {})
-                thumbnail_url = (
-                    formats.get('medium', {}).get('url') or
-                    formats.get('small', {}).get('url') or
-                    thumbnail_data.get('url', '')
-                )
+            # Extract thumbnail URL from nested formats
+            thumbnail = item.get('thumbnail', {})
+            formats = thumbnail.get('formats', {})
+            thumbnail_url = (
+                formats.get('medium', {}).get('url') or
+                formats.get('small', {}).get('url') or
+                thumbnail.get('url', '')
+            )
 
             posts.append({
                 'title': item.get('Title', ''),
