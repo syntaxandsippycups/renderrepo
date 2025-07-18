@@ -69,7 +69,6 @@ def unsubscribe(subscriber_id):
     except Exception as e:
         return render_template("/unsubscribe/failed.html", error=str(e))
 
-
 @app.route('/blog')
 @app.route('/category/<category_slug>')
 def blog(category_slug=None):
@@ -84,8 +83,10 @@ def blog(category_slug=None):
         posts = []
         for item in result.get('data', []):
             attr = item.get('attributes', {})
-            thumbnail_data = attr.get('thumbnail', {}).get('data', {})
-            thumbnail_url = thumbnail_data.get('attributes', {}).get('url', '')
+            thumbnail_data = attr.get('thumbnail', {}).get('data')
+            thumbnail_url = ''
+            if thumbnail_data:
+                thumbnail_url = thumbnail_data.get('attributes', {}).get('url', '')
 
             posts.append({
                 'title': attr.get('Title'),
