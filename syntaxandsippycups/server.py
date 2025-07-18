@@ -76,25 +76,28 @@ def blog(category_slug=None):
     try:
         category_filter = f"&filters[categories][slug][$eq]={category_slug}" if category_slug else ""
         response = requests.get(
-            f"{STRAPI_API}/blog-posts?populate=*&sort[0]=publishedAt:desc&pagination[limit]=9"
+            f"{STRAPI_API}/blog-posts?populate=thumbnail,categories&sort[0]=publishedAt:desc&pagination[limit]=9{category_filter}"
         )
         response.raise_for_status()
         result = response.json()
 
         posts = []
         for item in result.get('data', []):
+            attr = item.get('attributes', {})
+            thumbnail_data = attr.get('thumbnail', {}).get('data', {})
+            thumbnail_url = thumbnail_data.get('attributes', {}).get('url', '')
+
             posts.append({
-                'title': item.get('Title'),
-                'slug': item.get('slug'),
-                'thumbnail': STRAPI_URL + item.get('thumbnail', {}).get('formats', {}).get('small', {}).get('url', ''),
-                'publishedDate': item.get('publishedDate')
+                'title': attr.get('Title'),
+                'slug': attr.get('slug'),
+                'thumbnail': thumbnail_url,
+                'publishedDate': attr.get('publishedDate')
             })
 
         return render_template('/blog/index.html', posts=posts, category_slug=category_slug)
 
     except Exception as e:
         return render_template('/error/500.html', message=f"Error loading posts: {e}")
-
 
 @app.route('/blog/<slug>')
 def blog_detail(slug):
