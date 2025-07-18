@@ -86,7 +86,13 @@ def blog(category_slug=None):
             thumbnail_data = attr.get('thumbnail', {}).get('data')
             thumbnail_url = ''
             if thumbnail_data:
-                thumbnail_url = thumbnail_data.get('attributes', {}).get('url', '')
+                thumbnail_attrs = thumbnail_data.get('attributes', {})
+                formats = thumbnail_attrs.get('formats', {})
+                thumbnail_url = (
+                    formats.get('medium', {}).get('url') or
+                    formats.get('small', {}).get('url') or
+                    thumbnail_attrs.get('url', '')
+                )
 
             posts.append({
                 'title': attr.get('Title'),
@@ -98,69 +104,94 @@ def blog(category_slug=None):
         return render_template('/blog/index.html', posts=posts, category_slug=category_slug)
 
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         return render_template('/error/500.html', message=f"Error loading posts: {e}")
+
 
 @app.route('/blog/<slug>')
 def blog_detail(slug):
-
     try:
-        # Get the selected blog post
         response = requests.get(f"{STRAPI_API}/blog-posts?filters[slug][$eq]={slug}&populate=*")
-        data = response.json()['data']
+        response.raise_for_status()
+        data = response.json().get('data')
         if not data:
             return render_template('/error/500.html', message=f"Blog post not found for slug: {slug}")
 
-        post_data = data[0]
+        post_attrs = data[0].get('attributes', {})
 
+        # Safely handle thumbnail
+        thumbnail_data = post_attrs.get('thumbnail', {}).get('data')
+        thumbnail_url = ''
+        if thumbnail_data:
+            thumbnail_attrs = thumbnail_data.get('attributes', {})
+            formats = thumbnail_attrs.get('formats', {})
+            thumbnail_url = (
+                formats.get('medium', {}).get('url') or
+                formats.get('small', {}).get('url') or
+                thumbnail_attrs.get('url', '')
+            )
 
         post = {
-            'title': post_data['Title'],
-            'content': Markup(markdown.markdown(post_data['content'])),
-            'slug': post_data['slug'],
-            'thumbnail': STRAPI_URL + post_data.get('thumbnail', {}).get('formats', {}).get('medium', {}).get('url', ''),
-            'publishedDate': post_data['publishedDate']
+            'title': post_attrs.get('Title'),
+            'content': Markup(markdown.markdown(post_attrs.get('content', ''))),
+            'slug': post_attrs.get('slug'),
+            'thumbnail': thumbnail_url,
+            'publishedDate': post_attrs.get('publishedDate')
         }
 
-        # Get recent posts
+        # Recent posts
         recent_resp = requests.get(f"{STRAPI_API}/blog-posts?sort=publishedDate:desc&pagination[limit]=3&populate=thumbnail")
-        recent = [
-            {
-                'title': item['Title'],
-                'slug': item['slug'],
-                'thumbnail': STRAPI_URL + item.get('thumbnail', {}).get('formats', {}).get('thumbnail', {}).get('url', ''),
-                'publishedDate': post_data['publishedDate']
-            }
-            for item in recent_resp.json().get('data', [])
-            if item['slug'] != slug  # Exclude current post
-        ]
+        recent = []
+        for item in recent_resp.json().get('data', []):
+            attr = item.get('attributes', {})
+            if attr.get('slug') == slug:
+                continue
 
-        # Get categories with post counts
+            thumb_data = attr.get('thumbnail', {}).get('data')
+            thumb_url = ''
+            if thumb_data:
+                thumb_attrs = thumb_data.get('attributes', {})
+                formats = thumb_attrs.get('formats', {})
+                thumb_url = (
+                    formats.get('thumbnail', {}).get('url') or
+                    formats.get('small', {}).get('url') or
+                    thumb_attrs.get('url', '')
+                )
+
+            recent.append({
+                'title': attr.get('Title'),
+                'slug': attr.get('slug'),
+                'thumbnail': thumb_url,
+                'publishedDate': attr.get('publishedDate')
+            })
+
+        # Categories
         try:
             categories_resp = requests.get(f"{STRAPI_API}/categories?populate=blog_posts")
-            categories_resp.raise_for_status()  # raises an exception if status is 4xx/5xx
-            #print("Strapi category response:", categories_resp.json())
-
+            categories_resp.raise_for_status()
             categories_json = categories_resp.json()
             categories = []
 
-            if categories_json and 'data' in categories_json:
-                for cat in categories_json['data']:
-                    attributes = cat.get('attributes', {})
-                    blog_posts = attributes.get('blog_posts', {}).get('data', [])
-                    categories.append({
-                        'name': attributes.get('name'),
-                        'slug': attributes.get('slug'),
-                        'count': len(blog_posts)
-                    })
-            else:
-                print("No 'data' found in categories response")
+            for cat in categories_json.get('data', []):
+                attributes = cat.get('attributes', {})
+                blog_posts = attributes.get('blog_posts', {}).get('data', [])
+                categories.append({
+                    'name': attributes.get('name'),
+                    'slug': attributes.get('slug'),
+                    'count': len(blog_posts)
+                })
 
             return render_template('/blog/blog_detail.html', post=post, recent=recent, categories=categories)
 
         except requests.exceptions.RequestException as req_err:
             return render_template('/error/500.html', message=f"Request error while loading categories: {req_err}")
+
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         return render_template('/error/500.html', message=f"Error loading blog: {e}")
+
 
 @app.route('/clothing')
 def clothing():
