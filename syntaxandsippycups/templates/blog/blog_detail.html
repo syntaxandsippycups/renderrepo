@@ -210,7 +210,11 @@
               <div class="post-item">
                 <img src="{{ r.thumbnail }}" alt="" class="flex-shrink-0">
                 <div>
-                  <h4><a href="{{ url_for('blog_detail', slug=r.slug) }}">{{ r.title }}</a></h4>
+                  {% if r.slug %}
+                    <h4><a href="{{ url_for('blog_detail', slug=r.slug) }}">{{ r.title }}</a></h4>
+                  {% else %}
+                    <h4>{{ r.title }}</h4>
+                  {% endif %}
                 </div>
               </div><!-- End recent post item-->
               {% endfor %}

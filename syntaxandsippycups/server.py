@@ -4,6 +4,7 @@ from markupsafe import Markup
 
 import requests
 import markdown
+import traceback
 
 app = Flask(__name__)
 
@@ -101,28 +102,26 @@ def blog(category_slug=None):
                 'publishedDate': attr.get('publishedDate')
             })
 
-        return render_template('/blog/index.html', posts=posts, category_slug=category_slug)
+        return render_template('blog/index.html', posts=posts, category_slug=category_slug)
 
     except Exception as e:
-        import traceback
         traceback.print_exc()
-        return render_template('/error/500.html', message=f"Error loading posts: {e}")
+        return render_template('error/500.html', message=f"Error loading posts: {e}")
 
 
 @app.route('/blog/<slug>')
 def blog_detail(slug):
     try:
+        # Main blog post
         resp = requests.get(f"{STRAPI_API}/blog-posts?filters[slug][$eq]={slug}&populate=*")
         resp.raise_for_status()
         data = resp.json().get('data', [])
         if not data:
-            return render_template('/error/500.html', message=f"No blog post found for slug={slug}")
+            return render_template('error/500.html', message=f"No blog post found for slug={slug}")
 
         attrs = data[0].get('attributes', {})
-        title = attrs.get('Title', '')
         content_md = attrs.get('content', '')
 
-        # Thumbnail
         thumbnail_data = attrs.get('thumbnail', {}).get('data')
         thumbnail_url = ''
         if thumbnail_data:
@@ -135,7 +134,7 @@ def blog_detail(slug):
             )
 
         post = {
-            'title': title,
+            'title': attrs.get('Title', ''),
             'content': Markup(markdown.markdown(content_md)),
             'slug': attrs.get('slug', ''),
             'thumbnail': thumbnail_url,
@@ -144,7 +143,7 @@ def blog_detail(slug):
 
         # Recent posts
         recent_posts = []
-        r = requests.get(f"{STRAPI_API}/blog-posts?sort=publishedDate:desc&pagination[limit]=4&populate=thumbnail")
+        r = requests.get(f"{STRAPI_API}/blog-posts?sort[0]=publishedAt:desc&pagination[limit]=4&populate=thumbnail")
         r.raise_for_status()
         for item in r.json().get('data', []):
             a = item.get('attributes', {})
@@ -159,7 +158,12 @@ def blog_detail(slug):
                 ta = td.get('attributes', {})
                 fm = ta.get('formats', {})
                 thumb2 = fm.get('thumbnail', {}).get('url') or ta.get('url', '')
-            recent_posts.append({'title': t2, 'slug': s2, 'thumbnail': thumb2, 'publishedDate': date2})
+            recent_posts.append({
+                'title': t2,
+                'slug': s2,
+                'thumbnail': thumb2,
+                'publishedDate': date2
+            })
 
         # Categories
         categories = []
@@ -173,12 +177,11 @@ def blog_detail(slug):
                 'count': len(at.get('blog_posts', {}).get('data', []))
             })
 
-        return render_template('/blog/blog_detail.html', post=post, recent=recent_posts, categories=categories)
+        return render_template('blog/blog_detail.html', post=post, recent=recent_posts, categories=categories)
 
     except Exception as e:
         traceback.print_exc()
-        return render_template('/error/500.html', message=f"Error in blog_detail: {e}")
-
+        return render_template('error/500.html', message=f"Error in blog_detail: {e}")
 
 @app.route('/clothing')
 def clothing():
