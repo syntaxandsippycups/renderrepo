@@ -4,18 +4,25 @@ export default {
   async afterCreate({ result }) {
     try {
       const fullPost = await strapi.entityService.findOne(
-        'api::blog-post.blog-post',
-        result.id,
-        { populate: ['thumbnail'] }
-      );
+      'api::blog-post.blog-post',
+      result.id,
+      { populate: ['thumbnail'] }
+    ) as {
+      Title: string;
+      content: string;
+      slug: string;
+      thumbnail?: {
+        url: string;
+      };
+    };
 
-      const title = fullPost.Title;
-      const content = fullPost.content;
-      const slug = fullPost.slug;
+    const title = fullPost.Title;
+    const content = fullPost.content;
+    const slug = fullPost.slug;
 
-      const thumbnailUrl = fullPost.thumbnail?.url
-        ? `https://api.syntaxandsippycups.com${fullPost.thumbnail.url}`
-        : undefined;
+    const thumbnailUrl = fullPost.thumbnail?.url
+      ? `https://api.syntaxandsippycups.com${fullPost.thumbnail.url}`
+      : undefined;
 
       const subscribers = await strapi.entityService.findMany('api::subscriber.subscriber');
 
