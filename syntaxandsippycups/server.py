@@ -134,15 +134,15 @@ def blog_detail(slug):
                 'publishedDate': item.get('publishedDate', '')
             })
 
-        categories = []
-        c = requests.get(f"{STRAPI_API}/categories?populate=blog_posts")
-        c.raise_for_status()
-        for cat in c.json().get('data', []):
-            categories.append({
-                'name': cat.get('name', ''),
-                'slug': cat.get('slug', ''),
-                'count': len(cat.get('blog_posts', {}).get('data', []))
-            })
+        categories = [
+            {
+                'id': cat['id'],
+                'title': cat['Title'],
+                'slug': cat['slug'],
+                'count': len(cat.get('blog_posts', [])) if isinstance(cat.get('blog_posts'), list) else 0
+            }
+            for cat in categories_raw
+        ]
 
         return render_template('blog/blog_detail.html', post=post, recent=recent_posts, categories=categories)
 
