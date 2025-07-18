@@ -116,7 +116,7 @@ def blog_detail(slug):
         resp.raise_for_status()
         data = resp.json().get('data', [])
         if not data:
-            return render_template('error/500.html', message=f"No blog post found for slug={slug}")
+            return render_template('/error/500.html', message=f"No blog post found for slug={slug}")
 
         attrs = data[0].get('attributes', {})
         title = attrs.get('Title', '')
@@ -173,11 +173,11 @@ def blog_detail(slug):
                 'count': len(at.get('blog_posts', {}).get('data', []))
             })
 
-        return render_template('blog_detail.html', post=post, recent=recent_posts, categories=categories)
+        return render_template('/blog/blog_detail.html', post=post, recent=recent_posts, categories=categories)
 
     except Exception as e:
         traceback.print_exc()
-        return render_template('error/500.html', message=f"Error in blog_detail: {e}")
+        return render_template('/error/500.html', message=f"Error in blog_detail: {e}")
 
 
 @app.route('/clothing')
