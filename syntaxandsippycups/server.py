@@ -101,11 +101,11 @@ def blog(category_slug=None):
                 'publishedDate': item.get('publishedDate', '')
             })
 
-        return render_template('blog/index.html', posts=posts, category_slug=category_slug)
+        return render_template('/blog/index.html', posts=posts, category_slug=category_slug)
 
     except Exception as e:
         traceback.print_exc()
-        return render_template('error/500.html', message=f"Error loading posts: {e}")
+        return render_template('/error/500.html', message=f"Error loading posts: {e}")
 
 @app.route('/blog/<slug>')
 def blog_detail(slug):
